@@ -1,4 +1,5 @@
 package controllers;
+import api.InscripcionesControllerInterface;
 import com.mercadopago.resources.preference.Preference;
 import impl.*;
 import services.MercadoPagoService;
@@ -8,7 +9,7 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.util.*;
 
-public class InscripcionesController {
+public class InscripcionesController implements InscripcionesControllerInterface {
     private static InscripcionesController instance = new InscripcionesController();
 
     private HashMap<UUID, HashMap<UUID, Inscripcion>> inscripciones = new HashMap<>();
@@ -41,6 +42,10 @@ public class InscripcionesController {
         Carrera carrera = carrerasController.getCarreraPorNombre(alumno.getCarrera());
         Curso curso = cursosController.getCursoPorId(cursoId);
         Materia materia = materiasController.getMateriaPorCodigo(curso.getCodigoMateria());
+
+        if (alumno.getMateriasAprobadas().contains(curso.getCodigoMateria())) {
+            throw new IllegalArgumentException("El alumno ya posee aprobada esta materia.");
+        }
 
         int cantidadAlumnosInscriptos = this.getCantidadAlumnosEnCurso(cursoId);
 
@@ -120,12 +125,52 @@ public class InscripcionesController {
         this.finDeInscripciones = fin;
     }
 
-    private int getCantidadAlumnosEnCurso(UUID cursoId) {
+    public int getCantidadAlumnosEnCurso(UUID cursoId) {
         if (this.inscripciones.containsKey(cursoId)) {
             return this.inscripciones.get(cursoId).size();
         }
 
         return 0;
+    }
+
+    public ArrayList<UUID> getCursosPorMateriaYTurno(UUID codigoMateriaBuscada, Turno turnoBuscado) {
+        if (codigoMateriaBuscada == null && turnoBuscado == null) {
+            throw new IllegalArgumentException("Se debe completar al menos un parámetro de busqueda");
+        }
+
+        CursosController cursosController = CursosController.getInstance();
+
+        Set<UUID> cursos = cursosController.getCursos();
+        ArrayList<UUID> cursosFiltrados = new ArrayList<>();
+
+        if (codigoMateriaBuscada == null && turnoBuscado != null) {
+            for (UUID cursoId : cursos) {
+                Turno turno = cursosController.getCursoPorId(cursoId).getTurno();
+                if (turno.equals(turnoBuscado)) {
+                    cursosFiltrados.add(cursoId);
+                }
+            }
+        } else if (codigoMateriaBuscada != null && turnoBuscado == null) {
+            for (UUID cursoId : cursos) {
+                UUID codigoMateria = cursosController.getCursoPorId(cursoId).getCodigoMateria();
+
+                if (codigoMateria.equals(codigoMateriaBuscada)) {
+                    cursosFiltrados.add(cursoId);
+                }
+            }
+        } else {
+            ArrayList<UUID> cursosDeMateria = cursosController.getCursosDeMateria(codigoMateriaBuscada);
+
+            for (UUID cursoId : cursosDeMateria) {
+                Turno turno = cursosController.getCursoPorId(cursoId).getTurno();
+
+                if (turno.equals(turnoBuscado)) {
+                    cursosFiltrados.add(cursoId);
+                }
+            }
+        }
+
+        return cursosFiltrados;
     }
 
     private boolean tieneCorrelativasAprobadas(ArrayList<UUID> aprobadas, ArrayList<UUID> correlativasNecesarias) {

@@ -14,6 +14,7 @@ import com.itextpdf.layout.properties.UnitValue;
 import com.mercadopago.MercadoPagoConfig;
 import controllers.CursosController;
 import controllers.DocentesController;
+import controllers.InscripcionesController;
 import controllers.MateriasController;
 import impl.Curso;
 import impl.Docente;
@@ -41,6 +42,7 @@ public class PDFGeneratorService {
         CursosController cursosController = CursosController.getInstance();
         DocentesController docentesController = DocentesController.getInstance();
         MateriasController materiasController = MateriasController.getInstance();
+        InscripcionesController inscripcionesController = InscripcionesController.getInstance();
 
         Docente docente = docentesController.getDocentePorLegajo(legajoDocente);
         ArrayList<UUID> cursosAsignados = docentesController.getCursosAsignadosPorLegajoDocente(legajoDocente);
@@ -60,7 +62,7 @@ public class PDFGeneratorService {
             titulo.setMargin(20);
             document.add(titulo);
 
-            Table table = new Table(4);
+            Table table = new Table(5);
             table.setWidth(UnitValue.createPercentValue(100));
 
             DeviceRgb headerCellBackgroundColor = this.getRandomColor();
@@ -71,6 +73,7 @@ public class PDFGeneratorService {
             table.addCell(new Cell().add(new Paragraph("Materia")).addStyle(headerCellStyle));
             table.addCell(new Cell().add(new Paragraph("Fecha de inicio")).addStyle(headerCellStyle));
             table.addCell(new Cell().add(new Paragraph("Día y Horario")).addStyle(headerCellStyle));
+            table.addCell(new Cell().add(new Paragraph("Inscriptos")).addStyle(headerCellStyle));
             table.addCell(new Cell().add(new Paragraph("Aula")).addStyle(headerCellStyle));
 
             DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(new Locale("es", "ES"));
@@ -80,8 +83,9 @@ public class PDFGeneratorService {
                 Materia materia = materiasController.getMateriaPorCodigo(curso.getCodigoMateria());
 
                 table.addCell(new Cell().add(new Paragraph(materia.getNombre()))).addStyle(cellStyle);
-                table.addCell(new Cell().add(new Paragraph(curso.getFechaInicio().format(formatter).toString()))).addStyle(cellStyle);
+                table.addCell(new Cell().add(new Paragraph(curso.getFechaInicio().format(formatter)))).addStyle(cellStyle);
                 table.addCell(new Cell().add(new Paragraph(curso.getDia() + " - " + curso.getTurno().getHorarioInicio() + " a " + curso.getTurno().getHorarioFinalizacion()))).addStyle(cellStyle);
+                table.addCell(new Cell().add(new Paragraph(String.valueOf(inscripcionesController.getCantidadAlumnosEnCurso(cursoId))))).addStyle(cellStyle);
                 table.addCell(new Cell().add(new Paragraph(String.valueOf(curso.getNumeroAula())))).addStyle(cellStyle);
             }
 
