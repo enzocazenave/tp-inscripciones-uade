@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface InscripcionesControllerInterface {
     Inscripcion crearInscripcion(UUID legajoAlumno, UUID cursoId);
-    String pagarInscripcionesPendientesDeAlumno(UUID legajoAlumno);
+    String pagarInscripcionesPendientesDeAlumno(UUID legajoAlumno) throws IllegalAccessException;
     void setPrecioMateria(double precio);
     void setNuevaFechaDeInscripciones(LocalDate inicio, LocalDate fin);
     int getCantidadAlumnosEnCurso(UUID cursoId);

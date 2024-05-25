@@ -4,7 +4,10 @@ import impl.Curso;
 import impl.Docente;
 import impl.Materia;
 import impl.Turno;
+import services.ExcelGeneratorService;
+import services.PDFGeneratorService;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
@@ -78,5 +81,15 @@ public class DocentesController implements DocentesControllerInterface {
         }
 
         return (double) cargaHorariaMensual / 4; // divido 4 meses
+    }
+
+    public void generarInformeDeCursosAsignadosPorDocentePDF(UUID legajoDocente) throws FileNotFoundException {
+        PDFGeneratorService pdfGeneratorService = PDFGeneratorService.getInstance();
+        pdfGeneratorService.generarInformeDeCursosAsignadosPorDocente(legajoDocente);
+    }
+
+    public void generarInformeDeCursosAsignadosPorDocenteExcel(UUID legajoDocente) throws FileNotFoundException {
+        ExcelGeneratorService excelGeneratorService = ExcelGeneratorService.getInstance();
+        excelGeneratorService.generarInformeDeCursosAsignadosPorDocente(legajoDocente);
     }
 }

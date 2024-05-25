@@ -1,10 +1,6 @@
-import com.mercadopago.resources.preference.Preference;
 import controllers.*;
 import impl.*;
-import services.ExcelGeneratorService;
-import services.PDFGeneratorService;
 import java.io.FileNotFoundException;
-import java.net.URI;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,7 +8,7 @@ import java.util.Random;
 import java.util.UUID;
 
 public class Main {
-  public static void main(String[] args) throws FileNotFoundException {
+  public static void main(String[] args) throws FileNotFoundException, IllegalAccessException {
     // Instancias de controladores
     AlumnosController alumnosController = AlumnosController.getInstance();
     DocentesController docentesController = DocentesController.getInstance();
@@ -92,13 +88,10 @@ public class Main {
     System.out.println("Link de pago " + alumno2.getNombre() + " " + alumno2.getApellido() + ": " + linkDePago2);
 
     // Generacion de pdf de cursos asignados a docente
-    PDFGeneratorService pdfGeneratorService = PDFGeneratorService.getInstance();
-    ExcelGeneratorService excelGeneratorService = ExcelGeneratorService.getInstance();
-
-    pdfGeneratorService.generarInformeDeCursosAsignadosPorDocente(docente1.getLegajo());
-    pdfGeneratorService.generarInformeDeCursosAsignadosPorDocente(docente2.getLegajo());
-    excelGeneratorService.generarInformeDeCursosAsignadosPorDocente(docente1.getLegajo());
-    excelGeneratorService.generarInformeDeCursosAsignadosPorDocente(docente2.getLegajo());
+    docentesController.generarInformeDeCursosAsignadosPorDocentePDF(docente1.getLegajo());
+    docentesController.generarInformeDeCursosAsignadosPorDocentePDF(docente2.getLegajo());
+    docentesController.generarInformeDeCursosAsignadosPorDocenteExcel(docente1.getLegajo());
+    docentesController.generarInformeDeCursosAsignadosPorDocenteExcel(docente2.getLegajo());
 
     // Generacion de cronograma
     formatearCronograma(docentesController.getCronogramaSemanalPorLegajoDocente(docente2.getLegajo()));

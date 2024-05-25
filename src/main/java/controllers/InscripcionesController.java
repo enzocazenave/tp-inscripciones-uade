@@ -2,6 +2,7 @@ package controllers;
 import api.InscripcionesControllerInterface;
 import com.mercadopago.resources.preference.Preference;
 import impl.*;
+import services.BinanceService;
 import services.MercadoPagoService;
 
 import java.math.BigDecimal;
@@ -74,7 +75,7 @@ public class InscripcionesController implements InscripcionesControllerInterface
         return inscripcion;
     }
 
-    public String pagarInscripcionesPendientesDeAlumno(UUID legajoAlumno) {
+    public String pagarInscripcionesPendientesDeAlumno(UUID legajoAlumno) throws IllegalAccessException {
         AlumnosController alumnosController = AlumnosController.getInstance();
         CursosController cursosController = CursosController.getInstance();
         MateriasController materiasController = MateriasController.getInstance();
